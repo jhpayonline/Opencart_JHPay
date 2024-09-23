@@ -9,7 +9,10 @@
 - Find payment gateway **JHPAY**, click "Install", then "Edit" to configure it.
 - Enter the required API credentials and set the status to "Enabled".
 
-### 3. Test the Gateway
+### 3. Set your Callback URL in merchant's cabinet
+- URL: https://site.com/index.php?route=extension/payment/jhpay/callback (replace site.com to your)
+
+### 4. Test the Gateway
 - Place a test order to ensure everything works correctly.
 
 That's it!
