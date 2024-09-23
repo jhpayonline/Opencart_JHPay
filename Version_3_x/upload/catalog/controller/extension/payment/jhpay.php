@@ -67,7 +67,7 @@ class ControllerExtensionPaymentJhpay extends Controller
         $sign2 = hash_hmac('sha256', $post['id'] . '|' . $post['createdDateTime'] . '|' . $post['amount'], $token);
 
         if ($sign === $sign2) {
-            $order_id = explode('-', $post['id'])[0];
+            $order_id = explode('-', $post['order_id'])[0];
             $this->load->model('checkout/order');
             $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('config_order_status_id'));
         }
