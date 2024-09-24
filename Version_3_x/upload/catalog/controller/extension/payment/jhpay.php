@@ -32,6 +32,7 @@ class ControllerExtensionPaymentJhpay extends Controller
             'description' => $order_info['order_id'],
             'name' => implode(' ', [$order_info['firstname'], $order_info['lastname']]),
             'email' => $order_info['email'],
+            'phone' => $order_info['telephone'],
         ];
 
         $ch = curl_init('https://pay.jhpay.online/api/pay/order/create');
