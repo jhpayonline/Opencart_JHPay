@@ -12,14 +12,16 @@ class ControllerExtensionPaymentJhpay extends Controller
 
     public function confirm()
     {
-        $this->load->model('checkout/order');
-
         if (!isset($this->session->data['order_id'])) {
             return false;
         }
 
+        $this->load->model('checkout/order');
+
         $order_id = $this->session->data['order_id'];
         $order_info = $this->model_checkout_order->getOrder($order_id);
+
+        $this->addOrderHistory();
 
         $token = $this->config->get('jhpay_token');
         $amount = number_format($order_info['total'], 2, '.', '');
@@ -53,6 +55,58 @@ class ControllerExtensionPaymentJhpay extends Controller
 
         $this->session->data['error'] = $result['message'] ?? 'Error creating payment';
         $this->response->redirect($this->url->link('checkout/checkout', '', true));
+    }
+
+    private function addOrderHistory()
+    {
+        if(isset($this->session->data['order_id'])) {
+
+            $this->load->model('checkout/order');
+            $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('jhpay_order_status_id'));
+
+            $this->cart->clear();
+
+            // Add to activity log
+            if($this->config->get('config_customer_activity')) {
+
+                $this->load->model('account/activity');
+
+                if($this->customer->isLogged()) {
+
+                    $activity_data = [
+                        'customer_id' => $this->customer->getId(),
+                        'name'        => $this->customer->getFirstName() . ' ' . $this->customer->getLastName(),
+                        'order_id'    => $this->session->data['order_id'],
+                    ];
+                    $this->model_account_activity->addActivity('order_account', $activity_data);
+                }
+                else {
+
+                    $activity_data = [
+                        'name'     => $this->session->data['guest']['firstname'] . ' ' . $this->session->data['guest']['lastname'],
+                        'order_id' => $this->session->data['order_id'],
+                    ];
+                    $this->model_account_activity->addActivity('order_guest', $activity_data);
+                }
+            }
+
+            $list = [
+                'shipping_method',
+                'shipping_methods',
+                'payment_method',
+                'payment_methods',
+                'guest',
+                'comment',
+                'order_id',
+                'coupon',
+                'reward',
+                'voucher',
+                'vouchers',
+                'totals',
+            ];
+
+            foreach($list as $v) unset($this->session->data[$v]);
+        }
     }
 
     public function callback()
