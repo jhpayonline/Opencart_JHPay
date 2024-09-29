@@ -57,6 +57,10 @@ class ControllerExtensionPaymentJhpay extends Controller
         $this->response->redirect($this->url->link('checkout/checkout', '', true));
     }
 
+    /**
+     * Метод фиксации заказа
+     * @return void
+     */
     private function addOrderHistory()
     {
         if(isset($this->session->data['order_id'])) {
